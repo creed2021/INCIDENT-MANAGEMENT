@@ -87,15 +87,6 @@ annotate service.Incidents with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : title,
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : customer_ID,
-                Label : '{i18n>Cliente}',
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : status_code,
             },
             {
