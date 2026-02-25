@@ -7,31 +7,40 @@ annotate service.Incidents with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'customer_ID',
-                Value : customer_ID,
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : title,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'urgency_code',
-                Value : urgency_code,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'status_code',
-                Value : status_code,
+                Label : '{i18n>Cliente}',
+                Value : customer_ID,
             },
         ],
     },
     UI.Facets : [
         {
+            $Type : 'UI.CollectionFacet',
+            Label : '{i18n>Resumen}',
+            ID : 'i18nResumen',
+            Facets : [
+                {
+                    $Type : 'UI.ReferenceFacet',
+                    ID : 'GeneratedFacet1',
+                    Label : '{i18n>GeneralInformation}',
+                    Target : '@UI.FieldGroup#GeneratedGroup',
+                },
+                {
+                    $Type : 'UI.ReferenceFacet',
+                    Label : '{i18n>Detalles}',
+                    ID : 'i18nDetalles',
+                    Target : '@UI.FieldGroup#i18nDetalles',
+                },
+            ],
+        },
+        {
             $Type : 'UI.ReferenceFacet',
-            ID : 'GeneratedFacet1',
-            Label : 'General Information',
-            Target : '@UI.FieldGroup#GeneratedGroup',
+            Label : '{i18n>Conversaciones}',
+            ID : 'i18nConversaciones',
+            Target : 'conversation/@UI.LineItem#i18nConversaciones',
         },
     ],
     UI.LineItem : [
@@ -60,42 +69,84 @@ annotate service.Incidents with @(
         status_code,
         urgency_code,
     ],
+    UI.HeaderInfo : {
+        Title : {
+            $Type : 'UI.DataField',
+            Value : title,
+        },
+        TypeName : '',
+        TypeNamePlural : '',
+        Description : {
+            $Type : 'UI.DataField',
+            Value : customer.name,
+        },
+        TypeImageUrl : 'sap-icon://alert',
+    },
+    UI.FieldGroup #i18nDetalles : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : title,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : customer_ID,
+                Label : '{i18n>Cliente}',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : status_code,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : urgency_code,
+            },
+        ],
+    },
 );
 
 annotate service.Incidents with {
-    customer @Common.ValueList : {
-        $Type : 'Common.ValueListType',
-        CollectionPath : 'Customers',
-        Parameters : [
-            {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : customer_ID,
-                ValueListProperty : 'ID',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'firstName',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'lastName',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'name',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'email',
-            },
-        ],
-    }
+    customer @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Customers',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : customer_ID,
+                    ValueListProperty : 'ID',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'firstName',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'lastName',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'name',
+                },
+                {
+                    $Type : 'Common.ValueListParameterDisplayOnly',
+                    ValueListProperty : 'email',
+                },
+            ],
+        },
+        Common.Text : customer.name,
+        Common.Text.@UI.TextArrangement : #TextOnly,
+        Common.ValueListWithFixedValues : true,
+    )
 };
 
 annotate service.Incidents with {
     status @(
         Common.Label : '{i18n>Estado}',
         Common.ValueListWithFixedValues : true,
+        Common.Text : status.descr,
+        Common.Text.@UI.TextArrangement : #TextOnly,
     )
 };
 
@@ -103,6 +154,7 @@ annotate service.Incidents with {
     urgency @(
         Common.Label : '{i18n>Urgencia}',
         Common.ValueListWithFixedValues : true,
+        Common.Text : urgency.descr,
     )
 };
 
@@ -113,4 +165,23 @@ annotate service.Urgency with {
 annotate service.Status with {
     code @Common.Text : descr
 };
+
+annotate service.Incidents.conversation with @(
+    UI.LineItem #i18nConversaciones : [
+        {
+            $Type : 'UI.DataField',
+            Value : author,
+            Label : '{i18n>Autor}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : message,
+            Label : '{i18n>Message}',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : timestamp,
+        },
+    ]
+);
 
