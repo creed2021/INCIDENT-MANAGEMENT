@@ -1,0 +1,7 @@
+### PRUEBA
+GET http://localhost:4004/odata/v4/admin/Incidents
+Accept: application/json
+
+### TEJAR
+GET http://localhost:4004/odata/v4/prueba/tejar
+Accept: application/json

@@ -18,3 +18,13 @@ service AdminService {
     entity Customers as projection on my.Customers;
     entity Incidents as projection on my.Incidents;
     }
+
+ service prueba {
+
+    entity tejar as select from my.Customers {
+        firstName,
+        lastName,
+        email
+    }
+
+ }
