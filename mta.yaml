@@ -143,14 +143,31 @@ resources:
       service-name: incident-management-html5-service
       service-plan: app-host
 
+  # ✅ agregado: HTML5 app-runtime
+  - name: incident-management-html5-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+
   - name: incident-management-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
+      service: destination
+      service-name: incident-management-destination-service
+      service-plan: lite
       config:
         HTML5Runtime_enabled: true
         init_data:
           instance:
             destinations:
+              - Authentication: NoAuthentication
+                HTML5.DynamicDestination: true
+                HTML5.ForwardAuthToken: true
+                Name: srv-api
+                ProxyType: Internet
+                Type: HTTP
+                URL: ~{srv-api/srv-url}
               - Authentication: NoAuthentication
                 Name: ui5
                 ProxyType: Internet
@@ -158,11 +175,13 @@ resources:
                 URL: https://ui5.sap.com
             existing_destinations_policy: update
         version: 1.0.0
-      service: destination
-      service-name: incident-management-destination-service
-      service-plan: lite
     requires:
       - name: srv-api
+        group: destinations
+        properties:
+          forwardAuthToken: true
+          name: srv-api
+          url: ~{srv-url}
 
 parameters:
   deploy_mode: html5-repo
