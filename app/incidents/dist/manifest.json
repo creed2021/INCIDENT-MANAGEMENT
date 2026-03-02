@@ -29,6 +29,18 @@
 					"odataVersion": "4.01"
 				}
 			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"incidents-display": {
+					"semanticObject": "incidents",
+					"action": "display",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -141,7 +153,17 @@
 					"options": {
 						"settings": {
 							"editableHeaderContent": false,
-							"contextPath": "/Incidents"
+							"contextPath": "/Incidents",
+							"controlConfiguration": {
+								"conversation/@com.sap.vocabularies.UI.v1.LineItem#i18nConversaciones": {
+									"tableSettings": {
+										"type": "ResponsiveTable",
+										"creationMode": {
+											"name": "Inline"
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -157,5 +179,9 @@
 		"app": {
 			"enableLazyLoading": true
 		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "incidentmanagement.service"
 	}
 }

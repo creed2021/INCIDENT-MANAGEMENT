@@ -2,6 +2,7 @@ _schema-version: 3.3.0
 ID: incident-management
 description: A simple CAP project.
 version: 1.0.0
+
 modules:
   - name: incident-management-srv
     type: nodejs
@@ -19,6 +20,7 @@ modules:
       instances: 1
     build-parameters:
       builder: npm-ci
+
   - name: incident-management-db-deployer
     type: hdb
     path: gen/db
@@ -26,6 +28,18 @@ modules:
       - name: incident-management-db
     parameters:
       buildpack: nodejs_buildpack
+
+  - name: nsincidents
+    type: html5
+    path: app/incidents
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build:cf
+      supported-platforms: []
+
   - name: incident-management-app-content
     type: com.sap.application.content
     path: .
@@ -36,23 +50,10 @@ modules:
     build-parameters:
       build-result: resources
       requires:
-        - artifacts:
+        - name: nsincidents
+          artifacts:
             - nsincidents.zip
-          name: nsincidents
           target-path: resources/
-  - name: nsincidents
-    type: html5
-    path: app/incidents
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm install
-        - npm run build:cf
-        - npm ci
-        - npm run build
-      supported-platforms:
-        []
 
   - name: incident-management-app-deployer
     type: com.sap.application.content
@@ -60,20 +61,18 @@ modules:
     requires:
       - name: incident-management-auth
       - name: srv-api
-      - name: incident-management-html5-repo-host
+      - name: incident-management-repo-host
         parameters:
           content-target: true
           config:
             HTML5Runtime_enabled: true
-      - name: incident-management-repo-host
     build-parameters:
       build-result: app/
       requires:
-        - name: incidentmanagementincidents
-          artifacts:
-            - incidents.zip
-          target-path: app/
         - name: nsincidents
+          artifacts:
+            - nsincidents.zip
+          target-path: app/
 
   - name: incident-management-destinations
     type: com.sap.application.content
@@ -82,12 +81,12 @@ modules:
         parameters:
           service-key:
             name: incident-management-auth-key
-      - name: incident-management-html5-repo-host
+      - name: incident-management-repo-host
         parameters:
           service-key:
             name: incident-management-html5-repo-host-key
       - name: srv-api
-      - name: incident-management-destination
+      - name: incident-management-destination-service
         parameters:
           content-target: true
     build-parameters:
@@ -98,7 +97,7 @@ modules:
           existing_destinations_policy: update
           destinations:
             - Name: incident-management-html5-repository
-              ServiceInstanceName: incident-management-html5-repo-host
+              ServiceInstanceName: incident-management-html5-service
               ServiceKeyName: incident-management-html5-repo-host-key
               sap.cloud.service: incidentmanagement.service
             - Name: incident-management-auth
@@ -106,12 +105,14 @@ modules:
               ServiceInstanceName: incident-management-auth
               ServiceKeyName: incident-management-auth-key
               sap.cloud.service: incidentmanagement.service
+
 resources:
   - name: incident-management-db
     type: com.sap.xs.hdi-container
     parameters:
       service: hana
       service-plan: hdi-shared
+
   - name: incident-management-auth
     type: org.cloudfoundry.managed-service
     parameters:
@@ -134,17 +135,19 @@ resources:
       path: ./xs-security.json
       service: xsuaa
       service-plan: application
+
   - name: incident-management-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-name: incident-management-html5-service
       service-plan: app-host
+
   - name: incident-management-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
       config:
-        HTML5Runtime_enabled: false
+        HTML5Runtime_enabled: true
         init_data:
           instance:
             destinations:
@@ -160,9 +163,11 @@ resources:
       service-plan: lite
     requires:
       - name: srv-api
+
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
+
 build-parameters:
   before-all:
     - builder: custom
